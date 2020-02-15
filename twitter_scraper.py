@@ -1,6 +1,5 @@
 # getoldtweets3 library -> unlimited queries, no auth needed -> limited data
 # see docs in README
-# see bottom of file for tweepy code
 
 import GetOldTweets3 as got
 from langdetect import detect
