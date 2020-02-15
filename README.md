@@ -6,7 +6,7 @@ Install packages: `pip install -r requirements.txt`
 
 ## Real Time News Pipeline
 
-Real time pipeline for processing tweets and news articles. Processing pipeline to apply topic and entity extraction to tweets and news articles the saving into database.
+Real time pipeline for processing tweets and news articles. Processing pipeline to apply topic, sentiment, and entity extraction to tweets and news articles the saving into database.
 
 ### Twitter
 
@@ -18,20 +18,17 @@ https://github.com/amr-amr/CrisisTweetMap/tree/master/tweet_classifier
 
 ### News Sources
 
-Cheap news firehose ???
+Scrape news articles from provided RSS sources using newspaper3k.
 
 
 ### NLP
 
-Google Cloud Entity api for extracting entities. -> No disease specific NER.
-AutoML for custom entity model.
+For each article use the use the Google Natural Language API to:
+- Identify entities and sentiment towards each entity
+- Find topic of article
 
-
-Content Classification -> very broad
-Topic of the Tweet?
-
-
-Could also just do if there is a cluster of tweets with a certain sentiment in an area.
+For each Tweet:
+- Identify the mentioned entities and sentiment towards entities
 
 
 ### Twitter Scraper
@@ -48,6 +45,9 @@ EDIT: Twitter Dev Account approved and will implement scraping with Tweepy as we
 Tweepy Docs: https://tweepy.readthedocs.io/en/latest/getting_started.html
 
 
+## Future Steps
+- Train custom topic classification model on crisis topics.
+- Train entity extraction model for entities specific to a certain crisis. Ie: For Corona virus entity recognition for symptoms.
 
 
 
