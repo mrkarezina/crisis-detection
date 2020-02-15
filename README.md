@@ -1,5 +1,9 @@
 # Crisis Detection
 
+## Setup
+
+Install packages: `pip install -r requirements.txt`
+
 ## Real Time News Pipeline
 
 Real time pipeline for processing tweets and news articles. Processing pipeline to apply topic and entity extraction to tweets and news articles the saving into database.
