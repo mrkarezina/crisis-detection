@@ -34,6 +34,18 @@ Topic of the Tweet?
 Could also just do if there is a cluster of tweets with a certain sentiment in an area.
 
 
+### Twitter Scraper
+
+Currently using GetOldTweets3 Py Lib to scrape Tweets as currently roadblocked while
+waiting for Twitter Developer account approval to create auth tokens. 
+
+Benefits include being able to access tweets older than 7 days and having unlimited 
+query rates. However, limited tweet meta-data (geo-location is buggy) is offered.
+GetOldTweets3 Docs: https://github.com/Mottl/GetOldTweets3
+
+EDIT: Twitter Dev Account approved and will implement scraping with Tweepy as well
+
+Tweepy Docs: https://tweepy.readthedocs.io/en/latest/getting_started.html
 
 
 

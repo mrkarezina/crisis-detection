@@ -1,4 +1,6 @@
 Flask
 scikit-learn
 tweepy
+getoldtweets3
+langdetect
 pymongo
