@@ -1,24 +1,41 @@
 # Crisis Detection
 
+
 ## Setup
 
 Install packages: `pip install -r requirements.txt`
 
-## Real Time News Pipeline
 
-Real time pipeline for processing tweets and news articles. Processing pipeline to apply topic, sentiment, and entity extraction to tweets and news articles the saving into database.
+## Real Time Events Pipeline
 
-### Twitter
+Real time pipeline for processing news articles and tweets. Processing pipeline to apply topic, sentiment, and entity extraction to tweets and news articles the saving into database.
 
-[Twitter API](https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/intro-to-tweet-json)
-
-scrape + geolocate
-https://github.com/amr-amr/CrisisTweetMap/tree/master/tweet_classifier
+Given keyword(s) from the user, reputable news sources are scrapped for information relevant to the keywords. Location keywords are extracted, converted into latitude/longitude coordinates, and used as search parameters for tweets in a given geolocation. The resulting tweets are then categorized through NLP and assigned a sentiment rating.
 
 
 ### News Sources
 
 Scrape news articles from provided RSS sources using newspaper3k.
+
+
+### Twitter 
+
+Two versions of Tweet Scrapers have been implemented. One version uses the Tweepy library and the
+other version uses GetOldTweets3. For this project, we will use the Tweepy version as it offers more
+data. 
+
+#### Tweepy
+Access to Twitter's APIs using OAuth2. Limited query rate for tweets no older than 7 days old. However,
+Tweepy provides a wide variety of methods to access specific details from each tweet.
+[Tweepy Docs](https://tweepy.readthedocs.io/en/latest/getting_started.html)
+
+#### GetOldTweets3 
+Benefits include being able to access tweets older than 7 days and having unlimited 
+query rates. However, limited tweet meta-data (geo-location is buggy) is offered.
+[GetOldTweets3 Docs](https://github.com/Mottl/GetOldTweets3)
+
+
+[Twitter API](https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/intro-to-tweet-json)
 
 
 ### NLP
@@ -31,21 +48,8 @@ For each Tweet:
 - Identify the mentioned entities and sentiment towards entities
 
 
-### Twitter Scraper
-
-Currently using GetOldTweets3 Py Lib to scrape Tweets as currently roadblocked while
-waiting for Twitter Developer account approval to create auth tokens. 
-
-Benefits include being able to access tweets older than 7 days and having unlimited 
-query rates. However, limited tweet meta-data (geo-location is buggy) is offered.
-GetOldTweets3 Docs: https://github.com/Mottl/GetOldTweets3
-
-EDIT: Twitter Dev Account approved and will implement scraping with Tweepy as well
-
-Tweepy Docs: https://tweepy.readthedocs.io/en/latest/getting_started.html
-
-
 ## Future Steps
+
 - Train custom topic classification model on crisis topics.
 - Train entity extraction model for entities specific to a certain crisis. Ie: For Corona virus entity recognition for symptoms.
 
