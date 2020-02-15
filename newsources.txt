@@ -1,0 +1,3 @@
+https://www.cnn.com/sitemaps/cnn/news.xml
+https://www.bbc.co.uk/sitemaps/https-sitemap-uk-news-1.xml
+https://www.foxnews.com/sitemap.xml?type=articles
