@@ -1,41 +1,45 @@
-#getoldtweets3 library -> unlimited queries, no auth needed -> limited data
-#see docs in README
-#see bottom of file for tweepy code
+# getoldtweets3 library -> unlimited queries, no auth needed -> limited data
+# see docs in README
+# see bottom of file for tweepy code
 
 import GetOldTweets3 as got
 from langdetect import detect
 
-#input parameters
+# input parameters
 query_search = 'coronavirus'
 since_date = '2020-01-01'
 until_date = '2020-02-14'
 num_tweets = 10
 
-tweetCriteria = got.manager.TweetCriteria().setQuerySearch(query_search)\
-                                           .setSince(since_date)\
-                                           .setUntil(until_date)\
-                                           .setMaxTweets(num_tweets)
+# TODO: Fix the geoSpan = tweetPQ('span.Tweet-geo') tag in the Tweet Manager to get the geo data
+tweetCriteria = got.manager.TweetCriteria().setQuerySearch(query_search) \
+    .setSince(since_date) \
+    .setUntil(until_date) \
+    .setMaxTweets(num_tweets) \
+    # .setTopTweets(True)
 
 tweets = got.manager.TweetManager.getTweets(tweetCriteria)
 
-#create list of all tweets (all languages)
-all_tweets = [[tweet.date, tweet.text] for tweet in tweets]
+# create list of all tweets (all languages)
+all_tweets = [{
+    "text": tweet.text,
+    "date": "tweet.date",
+    "geo-data": tweet.geo
+} for tweet in tweets]
 
 en_tweets = []
 
-#filter out non-english tweets
+# filter out non-english tweets
 for tweet in all_tweets:
-    tweet_lang = detect(tweet[1])
+    tweet_lang = detect(tweet["text"])
 
-    if (tweet_lang == 'en'):
+    if tweet_lang == 'en':
         en_tweets.append(tweet)
 
 print(en_tweets)
 
-
-
-#tweepy library for python scraping
-#not used since roadblocked by Twitter Developer Approval wait time for auth tokens
+# tweepy library for python scraping
+# not used since roadblocked by Twitter Developer Approval wait time for auth tokens
 
 """
 import tweepy
@@ -59,14 +63,3 @@ except BaseException as e:
     time.sleep(3)
 
 """
-
-
-
-
-
-
-
-
-
-
-
