@@ -44,6 +44,56 @@ For each article use the use the Google Natural Language API to:
 - Identify entities and sentiment towards each entity
 - Find topic of article
 
+Ex: analyze_text("...") returns
+```
+{
+  'entities': [
+    {
+      'name': 'Apple',
+      'salience': 0.5572285056114197
+    },
+    {
+      'name': 'market',
+      'salience': 0.06980098783969879
+    },
+    {
+      'name': 'iPhone',
+      'salience': 0.029208600521087646
+    },
+    {
+      'name': 'product categories',
+      'salience': 0.028690919280052185
+    },
+    {
+      'name': 'people',
+      'salience': 0.024379173293709755
+    },
+    {
+      'name': 'revenue',
+      'salience': 0.012969419360160828
+    },
+    {
+      'name': 'way',
+      'salience': 0.011091737076640129
+    },
+    {
+      'name': 'case',
+      'salience': 0.010217440314590931
+    },
+    {
+      'name': 'shift',
+      'salience': 0.010174483992159367
+    },
+    {
+      'name': 'company',
+      'salience': 0.009243002161383629
+    }
+  ],
+  'topic': '/Computers & Electronics/Consumer Electronics'
+}
+```
+
+
 For each Tweet:
 - Identify the mentioned entities and sentiment towards entities
 

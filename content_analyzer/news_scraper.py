@@ -1,5 +1,6 @@
 import newspaper
-from article_downloader import Article
+import json
+from content_analyzer.article_downloader import Article
 
 # Imports the Google Cloud client library
 from google.cloud import language
@@ -66,7 +67,7 @@ def fetch_article(url):
         }
 
 
-def analyze_entities(text):
+def analyze_text(text):
     """
     Analyzes the entities and topics
     :param text:
@@ -97,7 +98,27 @@ def analyze_entities(text):
 # def long_lat():
 
 
-
 # Test
-a = fetch_article('https://techcrunch.com/2019/02/18/apple-could-be-looking-for-its-next-big-revenue-model')
-print(analyze_entities(a["text"]))
+# a = fetch_article('https://techcrunch.com/2019/02/18/apple-could-be-looking-for-its-next-big-revenue-model')
+# print(analyze_text(a["text"]))
+
+
+def handler(request):
+    data_dict = request.get_json()
+
+    try:
+        article_url = data_dict["article_url"]
+    except KeyError:
+        return 'Bad params'
+
+    article = fetch_article(article_url)
+
+    response = {
+        "content": article,
+        "nlp": analyze_text(article["text"])
+    }
+
+    response = json.dumps(response)
+    headers = {'Content-Type': 'application/json; charset=utf-8'}
+
+    return response, headers

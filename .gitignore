@@ -1,4 +1,4 @@
 venv
 .idea
-service_account.json
+content_analyzer/service_account.json
 
