@@ -4,13 +4,19 @@
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
 import tweepy
+import time
 
 
 #search parameters
 tweets_list = []
 text_query = 'Coronavirus'
 count = 3
+lat = 43.6532 #coords for Toronto
+longi = 79.3832
+radi_km = 50
+coord_rad = f"{lat},{longi},{radi_km}km"
 
+print(coord_rad)
 
 #access keys
 consumer_key = 'FyBL97wEZvFj5PrifZYKRfvb4'
@@ -28,12 +34,14 @@ try:
 # Pulling individual tweets from query
     for tweet in api.search(q=text_query, lang='en', count=count):
 # Adding to list that contains all tweets
-      tweets_list.append((tweet.created_at,tweet.id,tweet.text))
+      tweets_list.append((tweet.created_at,tweet.id, tweet.coordinates, tweet.text))
 except BaseException as e:
     print('failed on_status,',str(e))
     time.sleep(3)
 
 
 #output
+print(tweets_list)
+
 for tweet in tweets_list:
     print(tweet + tuple('\n'))
