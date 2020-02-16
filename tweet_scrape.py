@@ -6,6 +6,14 @@ from tweepy.streaming import StreamListener
 import tweepy
 import time
 
+from pymongo import MongoClient
+from pprint import pprint
+
+client = MongoClient("mongodb://Allen:allenpassword@crisismap-shard-00-00-x3wme.gcp.mongodb.net:27017,crisismap-shard-00-01-x3wme.gcp.mongodb.net:27017,crisismap-shard-00-02-x3wme.gcp.mongodb.net:27017/test?ssl=true&replicaSet=CrisisMap-shard-0&authSource=admin&retryWrites=true&w=majority")
+db=client.admin
+
+serverStatusResult=db.command("serverStatus")
+pprint(serverStatusResult)
 
 #search parameters
 tweets_list = []
