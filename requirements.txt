@@ -4,3 +4,5 @@ tweepy
 getoldtweets3
 langdetect
 pymongo
+dnspython
+google-cloud-language

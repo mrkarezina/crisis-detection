@@ -1,0 +1,3 @@
+google-cloud-language
+newspaper3k
+pymongo
