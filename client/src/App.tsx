@@ -10,7 +10,7 @@ const App = () => {
         const wheelListener = (evt: WheelEvent) => {
             evt.preventDefault()
             wheel += Math.pow(evt.deltaY / 30, 1)
-            console.log(wheel.toFixed(2), evt.deltaY)
+            if (Math.abs(evt.deltaY) > 100) console.log(wheel)
         }
         window.addEventListener("wheel", wheelListener, { passive: false })
         return () => window.removeEventListener("wheel", wheelListener)
