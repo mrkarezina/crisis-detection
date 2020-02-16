@@ -4,6 +4,7 @@ import styled from "styled-components"
 import GraphicsContainer from "./components/GraphicsContainer"
 import Timeline from "./components/molecules/Timeline"
 import { useSelector } from "./store"
+import Button from "./components/atoms/Button"
 
 const months = [
     "Jan",
@@ -33,18 +34,8 @@ const App = () => {
 
     const locations = [
         {
-            lat: 43.5338611,
-            long: -79.6960901,
-            date: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-        },
-        {
-            lat: 52.7330371,
-            long: -68.8860427,
-            date: new Date(new Date().getTime() - 48 * 60 * 60 * 1000)
-        },
-        {
-            lat: 38.8454059,
-            long: -9.1758703,
+            lat: -20.9,
+            long: 167.266,
             date: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
         }
     ]
@@ -63,16 +54,32 @@ const App = () => {
             Math.floor(data.wheel / 100) * timeInterval * 1000
     )
 
+    function animate(direction: "next" | "back") {
+        function loop(i) {
+            if (i >= 20) return
+            setData({
+                ...data,
+                wheel: data.wheel += direction == "back" ? 5 : -5
+            })
+            requestAnimationFrame(() => loop(i + 1))
+        }
+        loop(0)
+    }
+
     return (
         <Container className="App">
             <Image src={image} />
             <GraphicsContainer data={data} locations={locations} />
             <TimelineBackdrop>
-                <DayLabel>
-                    {`${
-                        months[currentDate.getMonth()]
-                    }. ${currentDate.getDate()}`}
-                </DayLabel>
+                <BottomRow>
+                    <Button onClick={() => animate("back")}>Back</Button>
+                    <DayLabel>
+                        {`${
+                            months[currentDate.getMonth()]
+                        }. ${currentDate.getDate()}`}
+                    </DayLabel>
+                    <Button onClick={() => animate("next")}>Next</Button>
+                </BottomRow>
             </TimelineBackdrop>
         </Container>
     )
@@ -95,13 +102,6 @@ const Image = styled.img`
     width: 100vw;
     bottom: 0;
 `
-const CustomTimeline = styled(Timeline)`
-    position: absolute;
-    bottom: 120px;
-    width: 80vw;
-    left: 10vw;
-    z-index: 10;
-`
 
 const TimelineBackdrop = styled.div`
     background: linear-gradient(
@@ -122,4 +122,10 @@ const DayLabel = styled.div`
     color: white;
     font-size: 32px;
     font-weight: 700;
+`
+
+const BottomRow = styled.div`
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 20px;
 `
