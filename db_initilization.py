@@ -18,6 +18,12 @@ credentials = service_account.Credentials.from_service_account_file("service_acc
 
 
 def tweet_analysis(text):
+    """
+    Get meta-data for a tweet text
+    :param text:
+    :return:
+    """
+
     # Instantiates a client
     client = language.LanguageServiceClient(credentials=credentials)
 
