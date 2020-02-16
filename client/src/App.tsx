@@ -23,22 +23,41 @@ const months = [
 
 const App = () => {
     const [data, setData] = useState({ index: 0, wheel: 0 })
+    const [locations, setLocations] = useState([])
     useEffect(() => {
-        fetch("/getClusters", {
-            method: "POST"
-        })
-            .then(res => res.json())
-            .then(json => console.log(json))
-            .catch(err => console.error(err))
-    }, [])
-
-    const locations = [
-        {
-            lat: -20.9,
-            long: 167.266,
-            date: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+        function fetchDays() {
+            const promises = Promise.all(
+                [...Array(5)].map((_, i) => {
+                    return fetch("/queryTweets", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            keyword: "coronavirus",
+                            end_date: `2020-02-${i + 10}`
+                        })
+                    })
+                        .then(res => res.json())
+                        .catch(err => console.error(err))
+                })
+            )
+            let allLocations = []
+            promises.then(newLocations => {
+                newLocations.forEach(
+                    locationArr =>
+                        (allLocations = [...allLocations, ...locationArr])
+                )
+                setLocations(
+                    allLocations.map(location => {
+                        return {
+                            lat: parseFloat(location.lat),
+                            long: parseFloat(location.long),
+                            date: new Date(parseInt(location.date) * 1000)
+                        }
+                    })
+                )
+            })
         }
-    ]
+        fetchDays()
+    }, [])
 
     useEffect(() => {
         const wheelListener = (evt: WheelEvent) => {
