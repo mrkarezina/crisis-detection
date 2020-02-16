@@ -5,37 +5,27 @@
 
 Install packages: `pip install -r requirements.txt`
 
+Add a `service_account.json` with permissions to call Google Natural Language API.
+
 
 ## Real Time Events Pipeline
 
 Real time pipeline for processing news articles and tweets. Processing pipeline to apply topic, sentiment, and entity extraction to tweets and news articles the saving into database.
 
-Given keyword(s) from the user, reputable news sources are scrapped for information relevant to the keywords. Location keywords are extracted, converted into latitude/longitude coordinates, and used as search parameters for tweets in a given geolocation. The resulting tweets are then categorized through NLP and assigned a sentiment rating.
+Given keyword(s) from the user, reputable news sources are scrapped for information relevant to the keywords such as related entities and topics. Location keywords are extracted, converted into latitude/longitude coordinates, and used as search parameters for tweets in a given geolocation. If specific locations not found, data was grouped into the capital of the known country.
+
+The resulting tweets are then categorized through NLP and assigned a sentiment rating. If there is a group of tweets with a high magnitude of sentiment towards the same entity in a given geographic area (within radius) of coordinate we say the group of tweets is a cluster.
+
+We move along the world maps in a grid like pattern for each. Calculate the average sentiment in a certain radius for each point on the grid. If the strength of the sentiment is above a certain threshold in that area we assign the tweets to a cluster.
 
 
 ### News Sources
 
 Scrape news articles from provided RSS sources using newspaper3k.
 
-
-### Twitter 
-
-Two versions of Tweet Scrapers have been implemented. One version uses the Tweepy library and the
-other version uses GetOldTweets3. For this project, we will use the Tweepy version as it offers more
-data. 
-
-#### Tweepy
-Access to Twitter's APIs using OAuth2. Limited query rate for tweets no older than 7 days old. However,
-Tweepy provides a wide variety of methods to access specific details from each tweet.
+### Tweepy
+Access to Twitter's APIs using OAuth2. Limited query rate for tweets no older than 7 days old. However, Tweepy provides a wide variety of methods to access specific details from each tweet.
 [Tweepy Docs](https://tweepy.readthedocs.io/en/latest/getting_started.html)
-
-#### GetOldTweets3 
-Benefits include being able to access tweets older than 7 days and having unlimited 
-query rates. However, limited tweet meta-data (geo-location is buggy) is offered.
-[GetOldTweets3 Docs](https://github.com/Mottl/GetOldTweets3)
-
-
-[Twitter API](https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/intro-to-tweet-json)
 
 
 ### NLP
@@ -94,8 +84,47 @@ Ex: analyze_text("...") returns
 ```
 
 
-For each Tweet:
-- Identify the mentioned entities and sentiment towards entities
+## Web Server
+
+We have a Flask web server which can take any keywords and search for relevant tweets. The self reported location of the tweeter's user's profile is processed and turned into a long / lat pair.
+
+Sample request:
+```json
+{
+	"keyword": "coronavirus",
+	"end_date": "2020-02-9"
+}
+```
+
+Sample response:
+```json
+[
+    {
+        "id": 1226294636013998080,
+        "date": "1581224399",
+        "lat": "30.5800",
+        "long": "114.2700"
+    },
+    {
+        "id": 1226294633514270721,
+        "date": "1581224398",
+        "lat": "29.7869",
+        "long": "-95.3905"
+    },
+    {
+        "id": 1226294629353623554,
+        "date": "1581224397",
+        "lat": "30.5800",
+        "long": "114.2700"
+    },
+    {
+        "id": 1226294628250476545,
+        "date": "1581224397",
+        "lat": "33.8560",
+        "long": "-112.1168"
+    }
+]
+```
 
 
 ## Future Steps

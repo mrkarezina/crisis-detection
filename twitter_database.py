@@ -1,8 +1,6 @@
 import pymongo
 from tweepy import OAuthHandler
-from tweepy.streaming import StreamListener
 import tweepy
-import time
 
 from google.cloud import language
 from google.cloud.language import enums
@@ -19,7 +17,7 @@ credentials = service_account.Credentials.from_service_account_file("service_acc
 
 def tweet_analysis(text):
     """
-    Get meta-data for a tweet text
+    NLP analysis tweet text
     :param text:
     :return:
     """
@@ -49,6 +47,14 @@ def tweet_analysis(text):
 
 
 def save_tweet_data(params):
+    """
+    Saves the tweet and
+    :param params:
+        - the tweet object
+        - the language string: ['en', 'es', 'ja']
+    :return:
+    """
+
     tweet, language = params[0], params[1]
 
     db.tweets.insert_one({
@@ -63,17 +69,12 @@ def save_tweet_data(params):
     print(f"Inserted: {tweet.text}")
 
 
-# # search parameters
+# search parameters
 tweets_list = []
 # text_query = "coronavirus OR COVID-19"
 text_query = "\"via rail\""
 count = 1000
-# lat = 43  # coords for Toronto
-# longi = 79
-# radi_km = 500
-# coord_rad = f"{lat},{longi},{radi_km}km"
-# print(coord_rad)
-#
+
 # access keys
 consumer_key = 'FyBL97wEZvFj5PrifZYKRfvb4'
 consumer_secret = 'u9rkw1XrCplTZQaG6OEsMJkbaAWQp6rZwC8F4yt9LXH8Ho83Il'
@@ -85,16 +86,6 @@ auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 
-# for lang in ['en']:
-#     for tweet in api.search(q="via rail", lang=lang, count=count):
-#         try:
-#             print(tweet)
-#             # save_tweet_data(tweet, lang)
-#         except BaseException as e:
-#             print('failed on_status,', str(e))
-#             time.sleep(3)
-
-
 # Multithreaded
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -104,13 +95,8 @@ for lang in ['en', 'es', 'ja']:
 
     # Async execution
     with ThreadPoolExecutor(max_workers=15) as executor:
-
         for tweet in api.search(q=text_query, lang=lang, count=count):
             futures.append(executor.submit(save_tweet_data, [tweet, lang]))
-
         for future in as_completed(futures):
             if future.result() is not None:
                 pass
-
-
-

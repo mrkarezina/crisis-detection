@@ -1,5 +1,6 @@
 venv
 .idea
-content_analyzer/service_account.json
+news_analyzer/service_account.json
 .vscode/
 service_account.json
+__pycache__

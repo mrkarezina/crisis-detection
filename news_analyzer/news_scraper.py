@@ -1,6 +1,6 @@
 import newspaper
 import json
-from content_analyzer.article_downloader import Article
+from news_analyzer.article_downloader import Article
 
 # Imports the Google Cloud client library
 from google.cloud import language
@@ -10,8 +10,6 @@ from google.oauth2 import service_account
 
 credentials = service_account.Credentials.from_service_account_file("service_account.json")
 retry_article_parse_tokens = 100
-
-
 
 
 def download(url, clean_doc=True):
@@ -89,9 +87,6 @@ def analyze_text(text):
 
         "topic": categories[0].name
     }
-
-
-# def long_lat():
 
 
 # Test

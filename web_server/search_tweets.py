@@ -1,7 +1,4 @@
 import pymongo
-import re
-import random
-import geopy
 import search_cities
 import tweepy
 from tweepy import OAuthHandler
@@ -27,21 +24,23 @@ def search(text_query, end_date):
     """
     Query from Mongodb all tweets within date.
     Return array of clusters.
-    :param keyword:
-    :param start_date:
+    :param text_query:
     :param end_date:
     :return:
     """
 
+    # Search mongoDB instead
+    # TODO: change to ["text"] notation if using mongodb
     # result = db.tweets.find({"language": "en", "text": {"$regex": keyword}})
+
     # End date format: "2020-02-10"
-    result = api.search(q=text_query, lang='en', count=300, until=end_date)
+    # Max count 100
+    result = api.search(q=text_query, lang='en', count=100, until=end_date, result_type="popular")
 
     tweets = []
 
     for res in result:
         try:
-            # TODO: change to ["text"] notation if using mongodb
             words = res.text.split(" ")
 
             lat_long = {}
@@ -64,6 +63,5 @@ def search(text_query, end_date):
             print(e)
 
     return tweets
-
 
 # print(search(text_query="coronavirus", end_date="2020-02-14"))
