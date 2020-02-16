@@ -1,62 +1,20 @@
 from flask import Flask, request
 import json
-import random
-
+from search_tweets import search
 
 app = Flask(__name__)
 
-# TODO: Replace with Redis Memecache
-# Just saves the tweets in the cluster with the cluster ID
-tweet_data = {}
 
-
-@app.route('/getClusters', methods=['POST'])
+@app.route('/queryTweets', methods=['POST'])
 def get_clusters():
-    # Get the keyword and news + time range
-    # Query the article with the keyword -> get it's entities and locations
-    # Find tweets with those entities. Stemming and lemmatization to improve matching with Word2vec for words.
-    # See if there is a geographic region with a lot of sentiment towards the topic
+    params = json.loads(request.data)
+    keyword = params["keyword"]
+    end_date = params["end_date"]
 
-    # Mongodb
-    # Move along the grid, calculate the average sentiment in that radius
-    # If above threshold give it a cluster -> put into cache
-
-    # Return clusters
-
-
-    # print(json.dumps(related_articles, indent=2))
-    response = app.response_class(
-        response=json.dumps(clusters),
-        status=200,
-        mimetype='application/json'
-    )
-
-    return response
-
-
-@app.route('/cluster/<string:cluster>/', methods=['GET'])
-def cluster_info(cluster):
-    print(cluster)
-
-    cluster = {
-        "tweets": [{
-            "date": "02-10-2020",
-            "id": 1228804298936659974,
-            "coordinates": {
-                "long": 43.6532,
-                "lat": 79.3832
-            },
-            "text": "RT @COVID_19NEWS: #coronavirus latest:\n- Confirmed infections in China increased by 5,093 overnight, bringing the nation’s total to 63,932"
-        }],
-        "articles": [{
-            "title": "China Blah Blah",
-            "date": "02-10-2020",
-            "text": "RT @COVID_19NEWS: #coronavirus latest:\n- Confirmed infections in China increased by 5,093 overnight, bringing the nation’s total to 63,932"
-        }]
-    }
+    tweets = search(keyword, end_date)
 
     response = app.response_class(
-        response=json.dumps(cluster),
+        response=json.dumps(tweets),
         status=200,
         mimetype='application/json'
     )
