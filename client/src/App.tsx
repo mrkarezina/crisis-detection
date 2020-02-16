@@ -28,15 +28,22 @@ const App = () => {
 
     function fetchDays(keyword: string) {
         const promises = Promise.all(
-            [...Array(5)].map((_, i) => {
-                return fetch("/queryTweets", {
+            [...Array(7)].map((_, i) => {
+                return fetch("http://127.0.0.1:5000/queryTweets", {
                     method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
                     body: JSON.stringify({
                         keyword: keyword,
-                        end_date: `2020-02-${i + 10}`
+                        end_date: `2020-02-${i + 9}`
                     })
                 })
                     .then(res => res.json())
+                    .then(json => {
+                        console.log(json)
+                        return json
+                    })
                     .catch(err => console.error(err))
             })
         )
@@ -95,7 +102,7 @@ const App = () => {
                 onSubmit={() => fetchDays(searchbar)}
             />
             <DataView>
-                <div>Results</div>
+                <div>Results (past 7 days)</div>
                 <div style={{ justifySelf: "end" }}>{locations.length}</div>
             </DataView>
             <Image src={image} />
@@ -169,4 +176,5 @@ const DataView = styled.div`
     padding: 20px;
     background-color: ${props => props.theme.colors.primaryDark};
     color: white;
+    z-index: 100;
 `

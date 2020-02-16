@@ -61,7 +61,7 @@ def cluster_tweets(keyword, start_date, end_date, cache):
             continue
         #coordinates = search.get_lat_long()
         clusters.append({
-            "id": key,
+            "id": res.id,
             "number_tweets": 25,
             "date": res.date,
             "number_articles": 3,

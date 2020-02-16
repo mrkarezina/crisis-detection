@@ -52,7 +52,7 @@ def search(text_query, end_date):
             if not ('lat' in lat_long):
                 continue
             tweets.append({
-                "id": res.id,
+                "id": str(res.id),
                 # Convert created at date to unix timestamp
                 "date": res.created_at.strftime('%s'),
                 "lat": lat_long['lat'],

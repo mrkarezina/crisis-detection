@@ -217,12 +217,17 @@ class GraphicsContainer extends React.Component<
                     (1024 / 1.77778) -
                 512 / 1.77778
         }
-
-        this.circles.forEach((circle, i) => {
-            if (this._isInCircle(position, circle)) {
-                console.log(this.props.locations[i])
+        for (let i = 0; i < this.circles.length; ++i) {
+            if (this._isInCircle(position, this.circles[i])) {
+                const index = Math.floor(this.props.data.wheel / 100)
+                //if (this.props.locations[i].date == index * this.props.
+                window.open(
+                    `https://www.twitter.com/mrkarezina/status/${this.props.locations[i].id}`,
+                    "_blank"
+                )
+                return
             }
-        })
+        }
     }
 
     _isInCircle(pos: { x: number; y: number }, point: DecoratedPoint) {
