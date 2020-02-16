@@ -2,3 +2,4 @@ venv
 .idea
 content_analyzer/service_account.json
 .vscode/
+service_account.json
