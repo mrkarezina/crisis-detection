@@ -42,7 +42,9 @@ def tweet_analysis(text):
     }
 
 
-def save_tweet_data(tweet, language):
+def save_tweet_data(params):
+    tweet, language = params[0], params[1]
+
     db.tweets.insert_one({
         "language": language,
         "text": tweet.text,
@@ -75,10 +77,30 @@ auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 
-for lang in ['ja', 'es', 'en']:
-    for tweet in api.search(q=text_query, lang=lang, count=count):
-        try:
-            save_tweet_data(tweet, lang)
-        except BaseException as e:
-            print('failed on_status,', str(e))
-            time.sleep(3)
+# for lang in ['ja', 'es', 'en']:
+#     for tweet in api.search(q=text_query, lang=lang, count=count):
+#         try:
+#             save_tweet_data(tweet, lang)
+#         except BaseException as e:
+#             print('failed on_status,', str(e))
+#             time.sleep(3)
+#
+
+
+# Multithreaded
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+for lang in ['en', 'es', 'ja']:
+
+    futures = []
+
+    # Async execution
+    with ThreadPoolExecutor(max_workers=15) as executor:
+
+        for tweet in api.search(q=text_query, lang=lang, count=count):
+            futures.append(executor.submit(save_tweet_data, [tweet, lang]))
+
+        # TODO: get rid of this code
+        for future in as_completed(futures):
+            if future.result() is not None:
+                pass
