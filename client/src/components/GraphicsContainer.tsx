@@ -20,7 +20,7 @@ interface GraphicsProps {
         index: number
         wheel: number
     }
-    locations: { lat: number; long: number; date: Date }[]
+    locations: { id: string; lat: number; long: number; date: Date }[]
     timeInterval: number
     initialDate: Date
 }
@@ -74,7 +74,6 @@ class GraphicsContainer extends React.Component<
                         index * this.props.timeInterval * 1000
                 )
 
-                let found = false
                 this.circles.forEach((circle, i) => {
                     const rgba = circle.fill as RGBA
                     const expectedIndex = Math.floor(
@@ -103,7 +102,6 @@ class GraphicsContainer extends React.Component<
                             radius: value + i / 50,
                             fill: utils.rgba(value2 * 280, 200, rgba.b, 1)
                         })
-                        found = true
                     } else
                         circle.mutate({
                             radius: value + i / 50,
@@ -165,10 +163,12 @@ class GraphicsContainer extends React.Component<
         drawEngine.start()
 
         window.addEventListener("mousemove", this.mouseListener)
+        window.addEventListener("click", this.clickListener)
     }
 
     componentWillUnmount() {
         window.removeEventListener("mousemove", this.mouseListener)
+        window.removeEventListener("click", this.clickListener)
     }
 
     componentDidUpdate() {
@@ -198,6 +198,31 @@ class GraphicsContainer extends React.Component<
                     (1024 / 1.77778) -
                 512 / 1.77778
         }
+    }
+
+    clickListener = (evt: MouseEvent) => {
+        const gap =
+            window.innerHeight -
+            this.canvasRef.current.getBoundingClientRect().height
+        const position = {
+            x:
+                (evt.clientX /
+                    this.canvasRef.current.getBoundingClientRect().width) *
+                    1024 -
+                512,
+            y:
+                (1 -
+                    (evt.clientY - gap) /
+                        this.canvasRef.current.getBoundingClientRect().height) *
+                    (1024 / 1.77778) -
+                512 / 1.77778
+        }
+
+        this.circles.forEach((circle, i) => {
+            if (this._isInCircle(position, circle)) {
+                console.log(this.props.locations[i])
+            }
+        })
     }
 
     _isInCircle(pos: { x: number; y: number }, point: DecoratedPoint) {

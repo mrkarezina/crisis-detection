@@ -49,6 +49,7 @@ const App = () => {
             setLocations(
                 allLocations.map(location => {
                     return {
+                        id: location.id,
                         lat: parseFloat(location.lat),
                         long: parseFloat(location.long),
                         date: new Date(parseInt(location.date) * 1000)
@@ -93,6 +94,10 @@ const App = () => {
                 setText={setSearchbar}
                 onSubmit={() => fetchDays(searchbar)}
             />
+            <DataView>
+                <div>Results</div>
+                <div style={{ justifySelf: "end" }}>{locations.length}</div>
+            </DataView>
             <Image src={image} />
             <GraphicsContainer data={data} locations={locations} />
             <TimelineBackdrop>
@@ -153,4 +158,15 @@ const BottomRow = styled.div`
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-gap: 20px;
+`
+
+const DataView = styled.div`
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: absolute;
+    right: 30px;
+    top: 30px;
+    padding: 20px;
+    background-color: ${props => props.theme.colors.primaryDark};
+    color: white;
 `
