@@ -9,7 +9,7 @@ import time
 from pymongo import MongoClient
 from pprint import pprint
 
-client = MongoClient("mongodb://Allen:allenpassword@crisismap-shard-00-00-x3wme.gcp.mongodb.net:27017,crisismap-shard-00-01-x3wme.gcp.mongodb.net:27017,crisismap-shard-00-02-x3wme.gcp.mongodb.net:27017/test?ssl=true&replicaSet=CrisisMap-shard-0&authSource=admin&retryWrites=true&w=majority")
+client = MongoClient(""" ADD CONNECTION STRING HERE """)
 db=client.admin
 
 serverStatusResult=db.command("serverStatus")
