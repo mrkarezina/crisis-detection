@@ -106,6 +106,7 @@ const TargetPoint = styled.div<{ translateX: number }>`
     position: absolute;
     top: 50%;
     transform: translate(${props => props.translateX + 5}px, -50%);
+    transition: transform 0.2s ease;
     width: 20px;
     height: 20px;
     border-radius: 20px;

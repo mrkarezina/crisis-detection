@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import image from "./assets/map.svg"
 import styled from "styled-components"
 import GraphicsContainer from "./components/GraphicsContainer"
@@ -6,11 +6,33 @@ import Timeline from "./components/molecules/Timeline"
 
 let wheel = 0
 const App = () => {
+    const [index, setIndex] = useState(0)
     useEffect(() => {
+        fetch("/getClusters", {
+            method: "POST"
+        })
+            .then(res => res.json())
+            .then(json => console.log(json))
+            .catch(err => console.error(err))
+    })
+    useEffect(() => {
+        let running: "back" | "forward" | null = null
+        let startTime = 0
         const wheelListener = (evt: WheelEvent) => {
             evt.preventDefault()
             wheel += Math.pow(evt.deltaY / 30, 1)
-            if (Math.abs(evt.deltaY) > 100) console.log(wheel)
+            if (Math.abs(evt.deltaY) > 100) {
+                if (!running) {
+                    running = evt.deltaY > 0 ? "back" : "forward"
+                    startTime = performance.now()
+                    return
+                }
+                return
+            }
+            if (running) {
+                setIndex(Math.max(running == "back" ? index + 1 : index - 1, 0))
+                running = null
+            }
         }
         window.addEventListener("wheel", wheelListener, { passive: false })
         return () => window.removeEventListener("wheel", wheelListener)
@@ -21,7 +43,7 @@ const App = () => {
             <Image src={image} />
             <GraphicsContainer />
             <TimelineBackdrop />
-            <CustomTimeline index={0} />
+            <CustomTimeline index={index} />
         </Container>
     )
 }
