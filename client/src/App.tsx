@@ -18,6 +18,24 @@ const App = () => {
             .catch(err => console.error(err))
     }, [])
 
+    const locations = [
+        {
+            lat: 43.5338611,
+            long: -79.6960901,
+            date: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+        },
+        {
+            lat: 52.7330371,
+            long: -68.8860427,
+            date: new Date(new Date().getTime() - 48 * 60 * 60 * 1000)
+        },
+        {
+            lat: 38.8454059,
+            long: -9.1758703,
+            date: new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+        }
+    ]
+
     function onEndScroll() {
         const oldRunning = running
         running = null
@@ -56,7 +74,7 @@ const App = () => {
     return (
         <Container className="App">
             <Image src={image} />
-            <GraphicsContainer />
+            <GraphicsContainer data={data} locations={locations} />
             <TimelineBackdrop />
             <CustomTimeline
                 data={{ index: data.index, preTranslate: data.wheel }}
