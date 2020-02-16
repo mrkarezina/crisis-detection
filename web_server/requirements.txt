@@ -1,2 +1,4 @@
 Flask
 pymongo
+lru_cache
+pymongo

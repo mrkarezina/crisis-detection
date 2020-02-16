@@ -9,15 +9,21 @@ from google.cloud.language import enums
 from google.cloud.language import types
 from google.oauth2 import service_account
 
-client = pymongo.MongoClient(
-    "mongodb+srv://mrkarezina:kgIy1DznBD9dZjuu@cluster0-rmj90.gcp.mongodb.net/test?retryWrites=true&w=majority")
+from config import MONGO_CONNECTION_STRING
+
+client = pymongo.MongoClient(MONGO_CONNECTION_STRING)
 db = client.news_data
-serverStatusResult = db.command("serverStatus")
 
 credentials = service_account.Credentials.from_service_account_file("service_account.json")
 
 
 def tweet_analysis(text):
+    """
+    Get meta-data for a tweet text
+    :param text:
+    :return:
+    """
+
     # Instantiates a client
     client = language.LanguageServiceClient(credentials=credentials)
 
@@ -50,6 +56,7 @@ def save_tweet_data(params):
         "text": tweet.text,
         "date": tweet.created_at,
         "id": tweet.id,
+        "link": tweet.url,
         "nlp": tweet_analysis(text=tweet.text)
     })
 
@@ -58,7 +65,8 @@ def save_tweet_data(params):
 
 # # search parameters
 tweets_list = []
-text_query = "coronavirus OR COVID-19"
+# text_query = "coronavirus OR COVID-19"
+text_query = "\"via rail\""
 count = 1000
 # lat = 43  # coords for Toronto
 # longi = 79
@@ -77,14 +85,14 @@ auth = OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 
-# for lang in ['ja', 'es', 'en']:
-#     for tweet in api.search(q=text_query, lang=lang, count=count):
+# for lang in ['en']:
+#     for tweet in api.search(q="via rail", lang=lang, count=count):
 #         try:
-#             save_tweet_data(tweet, lang)
+#             print(tweet)
+#             # save_tweet_data(tweet, lang)
 #         except BaseException as e:
 #             print('failed on_status,', str(e))
 #             time.sleep(3)
-#
 
 
 # Multithreaded
@@ -100,7 +108,9 @@ for lang in ['en', 'es', 'ja']:
         for tweet in api.search(q=text_query, lang=lang, count=count):
             futures.append(executor.submit(save_tweet_data, [tweet, lang]))
 
-        # TODO: get rid of this code
         for future in as_completed(futures):
             if future.result() is not None:
                 pass
+
+
+

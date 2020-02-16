@@ -1,11 +1,67 @@
+import pymongo
+import re
+import random
+import geopy
+import secrets
+
+cities = {
+    # [N˚, W˚]
+    "japan": [36.2048, 138.2529],
+    "california": [36.7783, 119.4179],
+    "new_york": [40.7128, 74.0060],
+    "spain": [40.4637, 3.7492]
+}
+
+# TODO: move connection string to config
+client = pymongo.MongoClient(
+    "mongodb+srv://mrkarezina:kgIy1DznBD9dZjuu@cluster0-rmj90.gcp.mongodb.net/test?retryWrites=true&w=majority")
+db = client["news_data"]
 
 
-# Take keyword
-# Find news articles with keyword / topic ...
-# Find the most important entities / locations in those articles
-# TODO: location??
+def get_coordinate(lang):
+    if lang == 'ja':
+        return (cities["japan"][0] + 0.5 * random.random() - 1,
+                cities["japan"][1] + random.random() - 1)
+    elif lang == 'en':
+        return (cities["california"][0] + 3 * random.random() - 1,
+                cities["california"][1] + 10 * random.random() - 1)
+    elif lang == 'es':
+        return (cities["spain"][0] + 1 * random.random() - 1,
+                cities["spain"][1] + 1 * random.random() - 1)
 
 
+def cluster_tweets(keyword, start_date, end_date, cache):
+    """
+    Query from Mongodb all tweets within date.
+    Return array of clusters.
+    :param keyword:
+    :param start_date:
+    :param end_date:
+    :return:
+    """
+
+    # get coordinates based on language
+    # randomly generate coordinates of tweets inside a country / region
+    #
+    clusters = []
+
+    result = db.tweets.find({"language": "en", "text": {"$regex": keyword}}).limit(1000)
+
+    for res in result:
+        print(res)
+        key = secrets.token_hex(nbytes=16)
+        coordinates = get_coordinate('en')
+        clusters.append({
+            "id": key,
+            "number_tweets": 25,
+            "number_articles": 3,
+            "lat": coordinates[0],
+            "long": coordinates[1]
+        })
+
+        cache[key] = [res]
 
 
-
+a = {}
+cluster_tweets("via rail", 2, 3, a)
+# print(a)
