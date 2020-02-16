@@ -3,9 +3,22 @@ import image from "./assets/map.svg"
 import styled from "styled-components"
 import GraphicsContainer from "./components/GraphicsContainer"
 import Timeline from "./components/molecules/Timeline"
-let running: "back" | "forward" | null = null
-let isScrolling: any
-let invalidated = false
+import { useSelector } from "./store"
+
+const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+]
 
 const App = () => {
     const [data, setData] = useState({ index: 0, wheel: 0 })
@@ -36,50 +49,31 @@ const App = () => {
         }
     ]
 
-    function onEndScroll() {
-        const oldRunning = running
-        running = null
-        setData({
-            index: Math.max(
-                0,
-                oldRunning == "back" ? data.index + 1 : data.index - 1
-            ),
-            wheel: 0
-        })
-    }
-
     useEffect(() => {
         const wheelListener = (evt: WheelEvent) => {
             evt.preventDefault()
-            window.clearTimeout(isScrolling)
-
-            // Set a timeout to run after scrolling ends
-            isScrolling = setTimeout(function() {
-                if (!invalidated) onEndScroll()
-                invalidated = false
-            }, 66)
-            if (!running && Math.abs(evt.deltaY) > 20) {
-                running = evt.deltaY > 0 ? "back" : "forward"
-            } else if (Math.abs(evt.deltaY) > 20) {
-                setData({ ...data, wheel: data.wheel + evt.deltaY / 40 })
-            } else if (running) {
-                invalidated = true
-                onEndScroll()
-            }
+            setData({ ...data, wheel: data.wheel + evt.deltaY / 30 })
         }
         window.addEventListener("wheel", wheelListener, { passive: false })
         return () => window.removeEventListener("wheel", wheelListener)
     })
+    const { initialDate, timeInterval } = useSelector(state => state)
+    const currentDate = new Date(
+        initialDate.getTime() -
+            Math.floor(data.wheel / 100) * timeInterval * 1000
+    )
 
     return (
         <Container className="App">
             <Image src={image} />
             <GraphicsContainer data={data} locations={locations} />
-            <TimelineBackdrop />
-            <CustomTimeline
-                data={{ index: data.index, preTranslate: data.wheel }}
-                updateIndex={index => setData({ index, wheel: 0 })}
-            />
+            <TimelineBackdrop>
+                <DayLabel>
+                    {`${
+                        months[currentDate.getMonth()]
+                    }. ${currentDate.getDate()}`}
+                </DayLabel>
+            </TimelineBackdrop>
         </Container>
     )
 }
@@ -119,4 +113,13 @@ const TimelineBackdrop = styled.div`
     right: 0;
     bottom: 0;
     height: 30vh;
+    display: grid;
+    justify-items: center;
+    align-items: center;
+`
+
+const DayLabel = styled.div`
+    color: white;
+    font-size: 32px;
+    font-weight: 700;
 `
