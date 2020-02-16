@@ -12,10 +12,6 @@ credentials = service_account.Credentials.from_service_account_file("service_acc
 retry_article_parse_tokens = 100
 
 
-# Newspaper 3k for scraping the articles
-# Google Cloud SDK for NLP analysis
-# Find entities and locations from the article
-# Convert locations to lat / long
 
 
 def download(url, clean_doc=True):
