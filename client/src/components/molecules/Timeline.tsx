@@ -1,10 +1,17 @@
 import React, { MutableRefObject, useRef, useEffect, useState } from "react"
 import styled from "styled-components"
-import { useSelector } from "../../store"
+import { connect } from "react-redux"
+import { AppState } from "../../store"
 
 interface TimelineProps {
     className?: string
-    index: number
+    data: {
+        index: number
+        preTranslate: number
+    }
+    startDate?: Date
+    timeInterval?: number
+    updateIndex: (index: number) => void
 }
 
 const months = [
@@ -22,57 +29,133 @@ const months = [
     "Dec"
 ]
 
-const Timeline: React.FC<TimelineProps> = ({ className, index }) => {
-    const points = [...Array(7)]
+class Timeline extends React.Component<TimelineProps> {
+    points: undefined[]
+    pointRefs: React.RefObject<HTMLDivElement>[]
+    labelRefs: React.RefObject<HTMLDivElement>[]
+    lineRef: React.RefObject<HTMLDivElement>
+    targetPointRef: React.RefObject<HTMLDivElement>
+    pointPositions: number[]
+    internalRange: [number, number]
 
-    const pointsRef: React.MutableRefObject<(HTMLDivElement | null)[]> = useRef(
-        points.map(() => null)
-    )
-    const lineRef: React.MutableRefObject<HTMLDivElement> = useRef(null)
+    constructor(props: TimelineProps) {
+        super(props)
+        this.points = [...Array(7)]
 
-    const [pointPositions, setPointPositions] = useState<number[]>(
-        points.map(() => 0)
-    )
+        this.pointRefs = this.points.map(() => React.createRef())
+        this.lineRef = React.createRef()
+        this.targetPointRef = React.createRef()
+        this.internalRange = [0, 6]
+        this.labelRefs = this.points.map(() => React.createRef())
+    }
 
-    const date = useSelector(state => state.initialDate)
-    const timeInterval = useSelector(state => state.timeInterval)
-
-    const dates = points.map(
-        (_, i) => new Date(date.getTime() - (6 - i) * timeInterval * 1000)
-    )
-
-    useEffect(() => {
-        setPointPositions(
-            pointsRef.current.map(
-                ref =>
-                    ref.getBoundingClientRect().x -
-                    lineRef.current.getBoundingClientRect().x
-            )
+    componentDidMount() {
+        this.pointPositions = this.pointRefs.map(
+            ref =>
+                ref.current?.getBoundingClientRect().x -
+                this.lineRef.current?.getBoundingClientRect().x
         )
-    }, [])
+        this.targetPointRef.current.style.transform = `translate(${this
+            .pointPositions[this._transform(this.props.data.index)] +
+            5}px, -50%)`
+    }
 
-    return (
-        <Container className={className}>
-            <Line ref={lineRef}>
-                {points.map((_, i) => {
-                    return (
-                        <LabelContainer key={i}>
+    shouldComponentUpdate(nextProps: TimelineProps) {
+        if (nextProps.data.index !== this.props.data.index) {
+            return true
+        }
+        this.targetPointRef.current.style.transform = `translate(${this
+            .pointPositions[this._transform(this.props.data.index)] -
+            this.props.data.preTranslate}px, -50%)`
+        return false
+    }
+
+    componentDidUpdate(prevProps: TimelineProps) {
+        const { index } = this.props.data
+
+        const handleEnd = () => {
+            if (index == this.internalRange[1]) {
+                // shift data
+                let x = 0
+                const desiredWidth =
+                    this.pointPositions[1] - this.pointPositions[0]
+                const interval = setInterval(() => {
+                    x += desiredWidth / 20
+
+                    this.labelRefs.forEach(point => {
+                        point.current.style.transform = `translateX(${x}px)`
+                        this.targetPointRef.current.style.transform = `translate(${x}px, -50%)`
+                    })
+                    if (x >= desiredWidth - 0.1) clearInterval(interval)
+                }, 10)
+                return
+            }
+        }
+
+        const rawD =
+            this.pointPositions[this._transform(index)] -
+            this.pointPositions[this._transform(prevProps.data.index)] +
+            prevProps.data.preTranslate
+        const d = Math.abs(rawD)
+        let x = 0
+        const interval = setInterval(() => {
+            x += d / 20
+            this.targetPointRef.current.style.transform = `translate(${this
+                .pointPositions[this._transform(index)] -
+                rawD -
+                (rawD < 0 ? x : -x) +
+                5}px, -50%)`
+
+            if (x >= d - 0.1) {
+                clearInterval(interval)
+                handleEnd()
+            }
+        }, 10)
+    }
+
+    render() {
+        const { className, startDate, timeInterval } = this.props
+
+        const dates = this.points.map((_, i) => {
+            return new Date(
+                startDate.getTime() - this._transform(i) * timeInterval * 1000
+            )
+        })
+
+        return (
+            <Container className={className}>
+                <Line ref={this.lineRef}>
+                    {this.points.map((_, i) => (
+                        <LabelContainer key={i} ref={this.labelRefs[i]}>
                             <Label shouldOffset={i % 2 == 0}>{`${
                                 months[dates[i].getMonth()]
                             }. ${dates[i].getDate()}`}</Label>
-                            <Point ref={el => (pointsRef.current[i] = el)} />
+                            <Point
+                                ref={this.pointRefs[i]}
+                                onClick={() =>
+                                    this.props.updateIndex(this._transform(i))
+                                }
+                            />
                         </LabelContainer>
-                    )
-                })}
-            </Line>
-            <TargetPoint
-                translateX={pointPositions[index < 3 ? 6 - index : 3]}
-            />
-        </Container>
-    )
+                    ))}
+                </Line>
+                <TargetPoint ref={this.targetPointRef} />
+            </Container>
+        )
+    }
+    _transform = (i: number) => {
+        return this.internalRange[1] - i
+    }
 }
 
-export default Timeline
+const mapStateToProps = (state: AppState) => {
+    return {
+        startDate: state.initialDate,
+        timeInterval: state.timeInterval
+    }
+}
+
+export default connect(mapStateToProps)(Timeline)
 
 const Container = styled.div``
 const Line = styled.div`
@@ -100,15 +183,19 @@ const Point = styled.div`
     border: 5px solid ${props => props.theme.colors.primary};
     border-radius: 20px;
     grid-row: 2/3;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    &:hover {
+        background-color: ${props => props.theme.colors.primary};
+    }
 `
 
-const TargetPoint = styled.div<{ translateX: number }>`
+const TargetPoint = styled.div`
     position: absolute;
     top: 50%;
-    transform: translate(${props => props.translateX + 5}px, -50%);
-    transition: transform 0.2s ease;
     width: 20px;
     height: 20px;
+    transform: translate(0, -50%);
     border-radius: 20px;
     background-color: ${props => props.theme.colors.highlight};
 `

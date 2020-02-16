@@ -3,10 +3,12 @@ import image from "./assets/map.svg"
 import styled from "styled-components"
 import GraphicsContainer from "./components/GraphicsContainer"
 import Timeline from "./components/molecules/Timeline"
+let running: "back" | "forward" | null = null
+let isScrolling: any
+let invalidated = false
 
-let wheel = 0
 const App = () => {
-    const [index, setIndex] = useState(0)
+    const [data, setData] = useState({ index: 0, wheel: 0 })
     useEffect(() => {
         fetch("/getClusters", {
             method: "POST"
@@ -14,24 +16,37 @@ const App = () => {
             .then(res => res.json())
             .then(json => console.log(json))
             .catch(err => console.error(err))
-    })
+    }, [])
+
+    function onEndScroll() {
+        const oldRunning = running
+        running = null
+        setData({
+            index: Math.max(
+                0,
+                oldRunning == "back" ? data.index + 1 : data.index - 1
+            ),
+            wheel: 0
+        })
+    }
+
     useEffect(() => {
-        let running: "back" | "forward" | null = null
-        let startTime = 0
         const wheelListener = (evt: WheelEvent) => {
             evt.preventDefault()
-            wheel += Math.pow(evt.deltaY / 30, 1)
-            if (Math.abs(evt.deltaY) > 100) {
-                if (!running) {
-                    running = evt.deltaY > 0 ? "back" : "forward"
-                    startTime = performance.now()
-                    return
-                }
-                return
-            }
-            if (running) {
-                setIndex(Math.max(running == "back" ? index + 1 : index - 1, 0))
-                running = null
+            window.clearTimeout(isScrolling)
+
+            // Set a timeout to run after scrolling ends
+            isScrolling = setTimeout(function() {
+                if (!invalidated) onEndScroll()
+                invalidated = false
+            }, 66)
+            if (!running && Math.abs(evt.deltaY) > 20) {
+                running = evt.deltaY > 0 ? "back" : "forward"
+            } else if (Math.abs(evt.deltaY) > 20) {
+                setData({ ...data, wheel: data.wheel + evt.deltaY / 40 })
+            } else if (running) {
+                invalidated = true
+                onEndScroll()
             }
         }
         window.addEventListener("wheel", wheelListener, { passive: false })
@@ -43,7 +58,10 @@ const App = () => {
             <Image src={image} />
             <GraphicsContainer />
             <TimelineBackdrop />
-            <CustomTimeline index={index} />
+            <CustomTimeline
+                data={{ index: data.index, preTranslate: data.wheel }}
+                updateIndex={index => setData({ index, wheel: 0 })}
+            />
         </Container>
     )
 }

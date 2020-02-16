@@ -18,7 +18,7 @@ const initialState = {
     clusters: {}
 }
 
-type AppState = typeof initialState
+export type AppState = typeof initialState
 
 const rootReducer = (
     state: AppState = initialState,
