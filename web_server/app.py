@@ -1,13 +1,23 @@
 from flask import Flask, request
 import json
-import datetime
 import random
 
 app = Flask(__name__)
 
 
 @app.route('/getClusters', methods=['POST'])
-def home():
+def get_clusters():
+    # Get the keyword and news + time range
+    # Query the article with the keyword -> get it's entities and locations
+    # Find tweets with those entities. Stemming and lemmatization to improve matching with Word2vec for words.
+    # See if there is a geographic region with a lot of sentiment towards the topic
+
+    # Mongodb
+    # Move along the grid, calculate the average sentiment in that radius
+    # If above threshold give it a cluster -> put into cache
+
+    # Return clusters
+
     clusters = [{
         "id": f"Sj2e98nSF3djfwe{random.randint(0, 10)}",
         "number_tweets": 25,
