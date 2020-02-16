@@ -1,7 +1,8 @@
 import pymongo
 import re
-from random import random, choice
+import random
 import geopy
+import secrets
 
 cities = {
     # [N˚, W˚]
@@ -11,11 +12,6 @@ cities = {
     "spain": [40.4637, 3.7492]
 }
 
-# Take keyword
-# Find news articles with keyword / topic ...
-# Find the most important entities / locations in those articles
-# TODO: location??
-
 # TODO: move connection string to config
 client = pymongo.MongoClient(
     "mongodb+srv://mrkarezina:kgIy1DznBD9dZjuu@cluster0-rmj90.gcp.mongodb.net/test?retryWrites=true&w=majority")
@@ -24,17 +20,17 @@ db = client["news_data"]
 
 def get_coordinate(lang):
     if lang == 'ja':
-        return (cities["japan"][0] + 0.5 * random() - 1,
-                cities["japan"][1] + random() - 1)
+        return (cities["japan"][0] + 0.5 * random.random() - 1,
+                cities["japan"][1] + random.random() - 1)
     elif lang == 'en':
-        return (cities["california"][0] + 3 * random() - 1,
-                cities["california"][1] + 10 * random() - 1)
+        return (cities["california"][0] + 3 * random.random() - 1,
+                cities["california"][1] + 10 * random.random() - 1)
     elif lang == 'es':
-        return (cities["spain"][0] + 1 * random() - 1,
-                cities["spain"][1] + 1 * random() - 1)
+        return (cities["spain"][0] + 1 * random.random() - 1,
+                cities["spain"][1] + 1 * random.random() - 1)
 
 
-def cluster_tweets(keyword, start_date, end_date):
+def cluster_tweets(keyword, start_date, end_date, cache):
     """
     Query from Mongodb all tweets within date.
     Return array of clusters.
@@ -46,21 +42,26 @@ def cluster_tweets(keyword, start_date, end_date):
 
     # get coordinates based on language
     # randomly generate coordinates of tweets inside a country / region
+    #
+    clusters = []
 
-    result = db.tweets.find({"language": "en"}).limit(10)
+    result = db.tweets.find({"language": "en", "text": {"$regex": keyword}}).limit(1000)
+
     for res in result:
-        print(res["text"], type(res), f"coord {get_coordinate('en')}")
+        print(res)
+        key = secrets.token_hex(nbytes=16)
+        coordinates = get_coordinate('en')
+        clusters.append({
+            "id": key,
+            "number_tweets": 25,
+            "number_articles": 3,
+            "lat": coordinates[0],
+            "long": coordinates[1]
+        })
 
-    # for tweet in db.tweets.find({"text": {"$regex": "/and/"}}):
-    #     print(tweet["text"])
-
-    clusters = [{
-        "id": f"Sj2e98nSF3djfwe{random.randint(0, 10)}",
-        "number_tweets": 25,
-        "number_articles": 3,
-        "lat": 43.6532 + random.randint(-10, 10),
-        "long": 79.3832 + + random.randint(-10, 10)
-    } for _ in range(20)]
+        cache[key] = [res]
 
 
-cluster_tweets(1, 2, 3)
+a = {}
+cluster_tweets("via rail", 2, 3, a)
+# print(a)

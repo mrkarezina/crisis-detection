@@ -2,7 +2,12 @@ from flask import Flask, request
 import json
 import random
 
+
 app = Flask(__name__)
+
+# TODO: Replace with Redis Memecache
+# Just saves the tweets in the cluster with the cluster ID
+tweet_data = {}
 
 
 @app.route('/getClusters', methods=['POST'])

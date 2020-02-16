@@ -50,6 +50,7 @@ def save_tweet_data(params):
         "text": tweet.text,
         "date": tweet.created_at,
         "id": tweet.id,
+        "link": tweet.url,
         "nlp": tweet_analysis(text=tweet.text)
     })
 
@@ -104,3 +105,6 @@ for lang in ['en', 'es', 'ja']:
         for future in as_completed(futures):
             if future.result() is not None:
                 pass
+
+
+
