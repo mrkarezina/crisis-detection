@@ -1,9 +1,22 @@
-import React from "react"
+import React, { useEffect } from "react"
 import image from "./assets/map.svg"
 import styled from "styled-components"
 import GraphicsContainer from "./components/GraphicsContainer"
 import Timeline from "./components/molecules/Timeline"
+
+let wheel = 0
 const App = () => {
+    useEffect(() => {
+        const wheelListener = (evt: WheelEvent) => {
+            evt.preventDefault()
+            wheel += Math.pow(evt.deltaY / 30, 1)
+            if (wheel < -200) wheel = -200
+            if (wheel > 200) wheel = 200
+        }
+        window.addEventListener("wheel", wheelListener, { passive: false })
+        return () => window.removeEventListener("wheel", wheelListener)
+    })
+
     return (
         <Container className="App">
             <Image src={image} />
@@ -32,5 +45,8 @@ const Image = styled.img`
 `
 const CustomTimeline = styled(Timeline)`
     position: absolute;
-    bottom: 20px;
+    bottom: 120px;
+    width: 80vw;
+    left: 10vw;
+    z-index: 10;
 `
