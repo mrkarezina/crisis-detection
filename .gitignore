@@ -3,3 +3,4 @@ venv
 news_analyzer/service_account.json
 .vscode/
 service_account.json
+__pycache__
