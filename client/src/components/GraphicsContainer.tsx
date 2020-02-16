@@ -25,7 +25,10 @@ interface GraphicsProps {
     initialDate: Date
 }
 
-class GraphicsContainer extends React.Component<GraphicsProps> {
+class GraphicsContainer extends React.Component<
+    GraphicsProps,
+    { pointer: boolean }
+> {
     canvasRef: React.RefObject<HTMLDivElement>
     data: {
         index: number
@@ -37,6 +40,9 @@ class GraphicsContainer extends React.Component<GraphicsProps> {
     circles: DecoratedPoint[]
     mousePos: { x: number; y: number }
 
+    state = {
+        pointer: false
+    }
     drawFun = (
         locations: { lat: number; long: number; date: Date }[]
     ): DrawableFunction => {
@@ -68,6 +74,7 @@ class GraphicsContainer extends React.Component<GraphicsProps> {
                         index * this.props.timeInterval * 1000
                 )
 
+                let found = false
                 this.circles.forEach((circle, i) => {
                     const rgba = circle.fill as RGBA
                     const expectedIndex = Math.floor(
@@ -96,6 +103,7 @@ class GraphicsContainer extends React.Component<GraphicsProps> {
                             radius: value + i / 50,
                             fill: utils.rgba(value2 * 280, 200, rgba.b, 1)
                         })
+                        found = true
                     } else
                         circle.mutate({
                             radius: value + i / 50,
@@ -107,7 +115,12 @@ class GraphicsContainer extends React.Component<GraphicsProps> {
                             )
                         })
                 })
-                return this.circles
+
+                return this.circles.filter((_, i) => {
+                    const diff =
+                        date.getTime() - this.props.locations[i].date.getTime()
+                    return diff <= 3000 * this.props.timeInterval && diff >= 0
+                })
             }
             return {
                 draw,
@@ -196,7 +209,7 @@ class GraphicsContainer extends React.Component<GraphicsProps> {
     }
 
     render() {
-        return <Canvas ref={this.canvasRef} />
+        return <Canvas ref={this.canvasRef} pointer={this.state.pointer} />
     }
 }
 
@@ -208,7 +221,7 @@ const mapStateToProps = (state: AppState) => {
 }
 export default connect(mapStateToProps)(GraphicsContainer)
 
-const Canvas = styled.div`
+const Canvas = styled.div<{ pointer: boolean }>`
     position: absolute;
     left: 0;
     height: 55.28vw;

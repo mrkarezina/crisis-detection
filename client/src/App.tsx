@@ -5,6 +5,7 @@ import GraphicsContainer from "./components/GraphicsContainer"
 import Timeline from "./components/molecules/Timeline"
 import { useSelector } from "./store"
 import Button from "./components/atoms/Button"
+import SearchBar from "./components/molecules/SearchBar"
 
 const months = [
     "Jan",
@@ -24,40 +25,38 @@ const months = [
 const App = () => {
     const [data, setData] = useState({ index: 0, wheel: 0 })
     const [locations, setLocations] = useState([])
-    useEffect(() => {
-        function fetchDays() {
-            const promises = Promise.all(
-                [...Array(5)].map((_, i) => {
-                    return fetch("/queryTweets", {
-                        method: "POST",
-                        body: JSON.stringify({
-                            keyword: "coronavirus",
-                            end_date: `2020-02-${i + 10}`
-                        })
+
+    function fetchDays(keyword: string) {
+        const promises = Promise.all(
+            [...Array(5)].map((_, i) => {
+                return fetch("/queryTweets", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        keyword: keyword,
+                        end_date: `2020-02-${i + 10}`
                     })
-                        .then(res => res.json())
-                        .catch(err => console.error(err))
+                })
+                    .then(res => res.json())
+                    .catch(err => console.error(err))
+            })
+        )
+        let allLocations = []
+        promises.then(newLocations => {
+            newLocations.forEach(
+                locationArr =>
+                    (allLocations = [...allLocations, ...locationArr])
+            )
+            setLocations(
+                allLocations.map(location => {
+                    return {
+                        lat: parseFloat(location.lat),
+                        long: parseFloat(location.long),
+                        date: new Date(parseInt(location.date) * 1000)
+                    }
                 })
             )
-            let allLocations = []
-            promises.then(newLocations => {
-                newLocations.forEach(
-                    locationArr =>
-                        (allLocations = [...allLocations, ...locationArr])
-                )
-                setLocations(
-                    allLocations.map(location => {
-                        return {
-                            lat: parseFloat(location.lat),
-                            long: parseFloat(location.long),
-                            date: new Date(parseInt(location.date) * 1000)
-                        }
-                    })
-                )
-            })
-        }
-        fetchDays()
-    }, [])
+        })
+    }
 
     useEffect(() => {
         const wheelListener = (evt: WheelEvent) => {
@@ -85,8 +84,15 @@ const App = () => {
         loop(0)
     }
 
+    const [searchbar, setSearchbar] = useState("")
+
     return (
         <Container className="App">
+            <SearchBar
+                text={searchbar}
+                setText={setSearchbar}
+                onSubmit={() => fetchDays(searchbar)}
+            />
             <Image src={image} />
             <GraphicsContainer data={data} locations={locations} />
             <TimelineBackdrop>
