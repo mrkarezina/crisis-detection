@@ -12,6 +12,9 @@ const SearchBar: React.FC<{
                 placeholder="Search keyword"
                 value={text}
                 onChange={e => setText(e.target.value)}
+                onKeyPress={e => {
+                    if (e.key == 'Enter') onSubmit()
+                }}
             />
             <SubmitBtn onClick={() => onSubmit()}>Search</SubmitBtn>
         </Container>
