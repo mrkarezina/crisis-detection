@@ -3,6 +3,7 @@ import re
 import random
 import geopy
 import secrets
+import search 
 
 cities = {
     # [N˚, W˚]
@@ -48,15 +49,24 @@ def cluster_tweets(keyword, start_date, end_date, cache):
     result = db.tweets.find({"language": "en", "text": {"$regex": keyword}}).limit(1000)
 
     for res in result:
-        print(res)
         key = secrets.token_hex(nbytes=16)
-        coordinates = get_coordinate('en')
+        words = res.text.split(" ")
+        
+        lat_long = {}
+        for word in words:
+            if search.get_lat_long(word) is not None:
+                lat_long = search.get_lat_long(word)
+                break
+        if not ('lat' in lat_long):
+            continue
+        #coordinates = search.get_lat_long()
         clusters.append({
             "id": key,
             "number_tweets": 25,
+            "date": res.date,
             "number_articles": 3,
-            "lat": coordinates[0],
-            "long": coordinates[1]
+            "lat": lat_long['lat'],
+            "long": lat_long['long']
         })
 
         cache[key] = [res]
@@ -64,4 +74,4 @@ def cluster_tweets(keyword, start_date, end_date, cache):
 
 a = {}
 cluster_tweets("via rail", 2, 3, a)
-# print(a)
+print(a)

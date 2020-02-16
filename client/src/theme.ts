@@ -5,7 +5,8 @@ const theme = {
         primaryDark: "#4B6E84",
         dark: "#1A2B35",
         tint: "#77ABB7",
-        neutral: "#738692"
+        neutral: "#738692",
+        highlight: "#51D48D"
     }
 }
 
