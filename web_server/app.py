@@ -18,13 +18,6 @@ def get_clusters():
 
     # Return clusters
 
-    clusters = [{
-        "id": f"Sj2e98nSF3djfwe{random.randint(0, 10)}",
-        "number_tweets": 25,
-        "number_articles": 3,
-        "lat": 43.6532 + random.randint(-10, 10),
-        "long": 79.3832 + + random.randint(-10, 10)
-    } for _ in range(20)]
 
     # print(json.dumps(related_articles, indent=2))
     response = app.response_class(
