@@ -1,33 +1,73 @@
-import React, { useState, useEffect } from "react"
+import React, { MutableRefObject, useRef, useEffect, useState } from "react"
 import styled from "styled-components"
 import { useSelector } from "../../store"
 
 interface TimelineProps {
-    currentDate: Date
-    dateGap: number
     className?: string
-    timeline(action: "increment" | "decrement"): void
+    index: number
 }
 
-const Timeline: React.FC<TimelineProps> = ({ className, currentDate }) => {
+const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+]
+
+const Timeline: React.FC<TimelineProps> = ({ className, index }) => {
     const points = [...Array(7)]
 
+    const pointsRef: React.MutableRefObject<(HTMLDivElement | null)[]> = useRef(
+        points.map(() => null)
+    )
+    const lineRef: React.MutableRefObject<HTMLDivElement> = useRef(null)
+
+    const [pointPositions, setPointPositions] = useState<number[]>(
+        points.map(() => 0)
+    )
+
+    const date = useSelector(state => state.initialDate)
+    const timeInterval = useSelector(state => state.timeInterval)
+
+    const dates = points.map(
+        (_, i) => new Date(date.getTime() - (6 - i) * timeInterval * 1000)
+    )
+
     useEffect(() => {
-        updateTimeline(selectedDate, currentDate)
-    }, [currentDate])
+        setPointPositions(
+            pointsRef.current.map(
+                ref =>
+                    ref.getBoundingClientRect().x -
+                    lineRef.current.getBoundingClientRect().x
+            )
+        )
+    }, [])
 
     return (
         <Container className={className}>
-            <Line>
+            <Line ref={lineRef}>
                 {points.map((_, i) => {
                     return (
                         <LabelContainer key={i}>
-                            <Label offset={i % 2 == 0}>Date</Label>
-                            <Point />
+                            <Label shouldOffset={i % 2 == 0}>{`${
+                                months[dates[i].getMonth()]
+                            }. ${dates[i].getDate()}`}</Label>
+                            <Point ref={el => (pointsRef.current[i] = el)} />
                         </LabelContainer>
                     )
                 })}
             </Line>
+            <TargetPoint
+                translateX={pointPositions[index < 3 ? 6 - index : 3]}
+            />
         </Container>
     )
 }
@@ -56,16 +96,26 @@ const LabelContainer = styled.div`
 const Point = styled.div`
     width: 20px;
     height: 20px;
-    background-color: ${props => props.theme.colors.dark};
+    background-color: ${props => props.theme.colors.primaryDark};
     border: 5px solid ${props => props.theme.colors.primary};
     border-radius: 20px;
     grid-row: 2/3;
 `
 
-const Label = styled.div<{ offset?: boolean }>`
+const TargetPoint = styled.div<{ translateX: number }>`
+    position: absolute;
+    top: 50%;
+    transform: translate(${props => props.translateX + 5}px, -50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+    background-color: ${props => props.theme.colors.highlight};
+`
+
+const Label = styled.div<{ shouldOffset?: boolean }>`
     color: ${props => props.theme.colors.light};
     ${props =>
-        props.offset &&
+        props.shouldOffset &&
         `
         grid-row: 3/4;
     `}

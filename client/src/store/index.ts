@@ -10,9 +10,11 @@ date.setHours(0, 0, 0, 0)
 const lastWeek = new Date(date.getTime() - 24 * 60 * 60 * 1000 * 7)
 
 const initialState = {
+    currentDate: date,
     startDate: lastWeek,
     timeInterval: 24 * 60 * 60,
     endDate: date,
+    initialDate: date, // treated as 0 index
     clusters: {}
 }
 
@@ -22,7 +24,21 @@ const rootReducer = (
     state: AppState = initialState,
     action: ActionType
 ): AppState => {
-    switch (action) {
+    switch (action.type) {
+        case "INCREMENT_DATE":
+            return {
+                ...state,
+                currentDate: new Date(
+                    state.currentDate.getTime() + state.timeInterval * 1000
+                )
+            }
+        case "DECREMENT_DATE":
+            return {
+                ...state,
+                currentDate: new Date(
+                    state.currentDate.getTime() - state.timeInterval * 1000
+                )
+            }
         default:
             return state
     }
@@ -30,7 +46,14 @@ const rootReducer = (
 
 type RootState = ReturnType<typeof rootReducer>
 
-type ActionType = {}
+interface IncrementDateType {
+    type: "INCREMENT_DATE"
+}
+interface DecrementDateType {
+    type: "DECREMENT_DATE"
+}
+
+type ActionType = IncrementDateType | DecrementDateType
 
 const store = createStore(rootReducer)
 export default store

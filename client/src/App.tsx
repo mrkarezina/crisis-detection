@@ -10,8 +10,7 @@ const App = () => {
         const wheelListener = (evt: WheelEvent) => {
             evt.preventDefault()
             wheel += Math.pow(evt.deltaY / 30, 1)
-            if (wheel < -200) wheel = -200
-            if (wheel > 200) wheel = 200
+            console.log(wheel.toFixed(2), evt.deltaY)
         }
         window.addEventListener("wheel", wheelListener, { passive: false })
         return () => window.removeEventListener("wheel", wheelListener)
@@ -21,7 +20,8 @@ const App = () => {
         <Container className="App">
             <Image src={image} />
             <GraphicsContainer />
-            <CustomTimeline currentDate={new Date()} dateGap={24 * 60 * 60} />
+            <TimelineBackdrop />
+            <CustomTimeline index={0} />
         </Container>
     )
 }
@@ -49,4 +49,16 @@ const CustomTimeline = styled(Timeline)`
     width: 80vw;
     left: 10vw;
     z-index: 10;
+`
+
+const TimelineBackdrop = styled.div`
+    background: linear-gradient(
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0.3)
+    );
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 30vh;
 `
