@@ -2,7 +2,7 @@ import csv
 
 # Create a hash of cities and countries with long / lat pair as value
 
-f = open('../worldcities.csv', encoding="utf-8")
+f = open('worldcities.csv', encoding="utf-8")
 rows = csv.reader(f, delimiter=',')
 
 allHits = {}

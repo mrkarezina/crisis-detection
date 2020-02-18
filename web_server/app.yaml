@@ -9,6 +9,8 @@
 
 runtime: python37
 
+service: crisis-detection
+
 # Handlers define how to route requests to your application.
 handlers:
 
