@@ -10,6 +10,8 @@ Install packages: `pip install -r requirements.txt`
 
 Add a `service_account.json` with permissions to call Google Natural Language API.
 
+In run `python web_server/app.py` to start the flask server. In `client/` run `npm start` to start the dev server.
+
 
 ## Real Time Events Pipeline
 
